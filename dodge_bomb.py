@@ -43,7 +43,10 @@ def main():
             if event.type == pg.QUIT: 
                 return
         screen.blit(bg_img, [0, 0]) 
-
+        #衝突判定
+        if kk_rct.colliderect(bd_rct):
+            print("Game over")
+            return
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
         for k,v in key_dict.items():
