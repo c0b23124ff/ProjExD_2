@@ -87,7 +87,7 @@ def main():
     pg.draw.rect(bl_img,(0,0,0),(0,0,1600,900),1)
     bl_img.set_alpha
     bl_rct = bl_img.get_rect()
-    bl_rct.center = (-900,-400)
+    bl_rct.center = (0,0)
     #kk_dict={(0,-5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)
     #(-5,-5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)}
     key_dict={pg.K_UP:(0,-5),pg.K_DOWN:(0,5),pg.K_LEFT:(-5,0),pg.K_RIGHT:(5,0)}
@@ -139,10 +139,12 @@ def main():
         #screen.blit(bd_img, bd_rct)
         screen.blit(bd_imgs(min(tmr//500,9)),bd_rct)
         yoko, tate = check_bound(bd_rct)
-        if not yoko: #横にはみ出たら
-            vx *= -1
-        if not tate:
-            vy *= -1
+        vx *= 1 if yoko else -1
+        vy *= 1 if tate else -1
+        #if not yoko: #横にはみ出たら
+        #    vx *= -1
+        #if not tate:
+        #    vy *= -1
         pg.display.update()
         tmr += 1
         clock.tick(50)
