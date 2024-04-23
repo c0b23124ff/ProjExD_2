@@ -2,7 +2,7 @@ import os
 import random
 import sys
 import pygame as pg
-
+import time
 
 WIDTH, HEIGHT = 1600, 900
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -24,8 +24,7 @@ def check_bound(obj_rct):
 def kk_dic():
     """
     向きに対応する画像の辞書を作成
-    引数 移動量の合計値タプル(str)
-    戻り値:作成した辞書kk_dictの引数に対応する値
+    戻り値:作成した辞書kk_dict
     """
     kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)
     kk_dict={"5,0":kk_imgs} #右
@@ -47,29 +46,29 @@ def kk_dic():
     kk_dict["0,-5"]=kk_imgs #上
     kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 2.0)
     kk_dict["5,-5"]=kk_imgs #右上
-    
     return kk_dict
 
 
 def bd_accs(t):
     """
-    加速度のリスト
+    加速度のリストを作成
     引数：経過時間min(tmr//500,9)
     戻り値：引数に対応する加速度のリスト
     """
-    accs = [a for a in range(1,11)] #加速度のリスト
-    bb_imgs=[]
-    print(t)
-    
+    accs = [a for a in range(1,11)] #加速度のリスト    
     return accs[t]
 
 def bd_imgs(t):
+    """
+    爆弾のサイズのリストを作成
+    引数：経過時間min(tmr//500,9)
+    戻り値：引数に対応する爆弾サイズのSurface
+    """
     bb_imgs = []
     for r in range(1,11):
         bb_img=pg.Surface((20*r,20*r))
         pg.draw.circle(bb_img, (255,0,0),(10*r,10*r),10*r)
         bb_img.set_colorkey((0,0,0))
-
         bb_imgs.append(bb_img)
     return bb_imgs[t]
 
@@ -83,9 +82,12 @@ def main():
     kk_rct.center = 900, 400
     clock = pg.time.Clock()
     tmr = 0
-
-    
-    #向きの対応表
+    #黒背景
+    bl_img = pg.Surface((1600,900))
+    pg.draw.rect(bl_img,(0,0,0),(0,0,1600,900),1)
+    bl_img.set_alpha
+    bl_rct = bl_img.get_rect()
+    bl_rct.center = (-900,-400)
     #kk_dict={(0,-5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)
     #(-5,-5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)}
     key_dict={pg.K_UP:(0,-5),pg.K_DOWN:(0,5),pg.K_LEFT:(-5,0),pg.K_RIGHT:(5,0)}
@@ -103,6 +105,8 @@ def main():
         #衝突判定
         if kk_rct.colliderect(bd_rct):
             print("Game over")
+            screen.blit(bl_img, bl_rct) 
+            time.sleep(5.0)
             return
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
