@@ -21,6 +21,44 @@ def check_bound(obj_rct):
         tate = False
     return yoko, tate
 
+def kk_dic():
+    kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)
+    kk_dict={"5,0":kk_imgs} #右
+    kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 2.0)
+    kk_dict["5,5"]=kk_imgs #右下
+    kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), -90, 2.0)
+    kk_dict["0,5"]=kk_imgs #下
+    kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 2.0)
+    kk_imgs = pg.transform.flip(kk_imgs, True, False)
+    kk_dict["-5,5"]=kk_imgs #左下
+    kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)
+    kk_imgs = pg.transform.flip(kk_imgs, True, False)
+    kk_dict["-5,0"]=kk_imgs #左
+    kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 2.0)
+    kk_imgs = pg.transform.flip(kk_imgs, True, False)
+    kk_dict["-5,-5"]=kk_imgs #左上
+    kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), 90, 2.0)
+    kk_imgs = pg.transform.flip(kk_imgs, True, False)
+    kk_dict["0,-5"]=kk_imgs #上
+    kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 2.0)
+    kk_dict["5,-5"]=kk_imgs #右上
+    
+    return kk_dict
+
+
+def bd_accs():
+    """
+    加速度のリスト、拡大爆弾Surfaceのリスト
+    戻り値：リストのタプル
+    """
+    accs = [a for a in range(1,11)] #加速度のリスト
+    bb_imgs=[]
+    for r in range(1,11):
+        bb_img=pg.Surface((20*r,20*r))
+        pg.draw.circle(bb_img, (255,0,0),(10*r,10*r),10*r)
+        bb_imgs.append(bb_img)
+    return [accs, bb_imgs]
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -31,6 +69,11 @@ def main():
     kk_rct.center = 900, 400
     clock = pg.time.Clock()
     tmr = 0
+
+    
+    #向きの対応表
+    #kk_dict={(0,-5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)
+    #(-5,-5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)}
     key_dict={pg.K_UP:(0,-5),pg.K_DOWN:(0,5),pg.K_LEFT:(-5,0),pg.K_RIGHT:(5,0)}
     bd_img = pg.Surface((20,20))
     bd_img.set_colorkey((0,0,0))
@@ -53,6 +96,7 @@ def main():
             if key_lst[k]:
                 sum_mv[0] += v[0]
                 sum_mv[1] += v[1]
+                    
         #if key_lst[pg.K_UP]:
         #    sum_mv[1] -= 5
         #if key_lst[pg.K_DOWN]:
@@ -64,6 +108,11 @@ def main():
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
+        #screen.blit(kk_img, kk_rct)
+        if sum_mv[0] == 0 and sum_mv[1] == 0:
+            pass
+        else:
+            kk_img=kk_dic()[str(-sum_mv[0])+","+str(-sum_mv[1])]
         screen.blit(kk_img, kk_rct)
         #bg
         bd_rct.move_ip(vx,vy)
