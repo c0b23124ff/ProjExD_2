@@ -22,6 +22,11 @@ def check_bound(obj_rct):
     return yoko, tate
 
 def kk_dic():
+    """
+    向きに対応する画像の辞書を作成
+    引数 移動量の合計値タプル(str)
+    戻り値:作成した辞書kk_dictの引数に対応する値
+    """
     kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)
     kk_dict={"5,0":kk_imgs} #右
     kk_imgs = pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 2.0)
@@ -46,18 +51,27 @@ def kk_dic():
     return kk_dict
 
 
-def bd_accs():
+def bd_accs(t):
     """
-    加速度のリスト、拡大爆弾Surfaceのリスト
-    戻り値：リストのタプル
+    加速度のリスト
+    引数：経過時間min(tmr//500,9)
+    戻り値：引数に対応する加速度のリスト
     """
     accs = [a for a in range(1,11)] #加速度のリスト
     bb_imgs=[]
+    print(t)
+    
+    return accs[t]
+
+def bd_imgs(t):
+    bb_imgs = []
     for r in range(1,11):
         bb_img=pg.Surface((20*r,20*r))
         pg.draw.circle(bb_img, (255,0,0),(10*r,10*r),10*r)
+        bb_img.set_colorkey((0,0,0))
+
         bb_imgs.append(bb_img)
-    return [accs, bb_imgs]
+    return bb_imgs[t]
 
 
 def main():
@@ -76,8 +90,8 @@ def main():
     #(-5,-5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)}
     key_dict={pg.K_UP:(0,-5),pg.K_DOWN:(0,5),pg.K_LEFT:(-5,0),pg.K_RIGHT:(5,0)}
     bd_img = pg.Surface((20,20))
-    bd_img.set_colorkey((0,0,0))
     pg.draw.circle(bd_img,(255,0,0),(10,10),10)
+    bd_img.set_colorkey((0,0,0))
     bd_rct = bd_img.get_rect()
     bd_rct.center = random.randint(0,WIDTH),random.randint(0,HEIGHT)
     vx,vy = +5,+5
@@ -114,9 +128,12 @@ def main():
         else:
             kk_img=kk_dic()[str(-sum_mv[0])+","+str(-sum_mv[1])]
         screen.blit(kk_img, kk_rct)
-        #bg
-        bd_rct.move_ip(vx,vy)
-        screen.blit(bd_img, bd_rct)
+        #bg aで更新
+        avx = vx*bd_accs(min(tmr//500,9))#new
+        avy = vy*bd_accs(min(tmr//500,9))#new
+        bd_rct.move_ip(avx,avy)
+        #screen.blit(bd_img, bd_rct)
+        screen.blit(bd_imgs(min(tmr//500,9)),bd_rct)
         yoko, tate = check_bound(bd_rct)
         if not yoko: #横にはみ出たら
             vx *= -1
